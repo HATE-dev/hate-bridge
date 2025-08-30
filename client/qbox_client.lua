@@ -1,11 +1,9 @@
--- Auto-detect framework and return if not QBox
 if not Config or Config.DetectFramework() ~= 'qbox' then return end
 
 local QBX = exports['qbx_core']:GetCoreObject()
 local PlayerData = {}
 local isPlayerLoaded = false
 
--- Player events - Use config events
 local events = Config.FrameworkEvents['qbox']
 
 RegisterNetEvent(events.playerLoaded, function()
@@ -25,15 +23,12 @@ RegisterNetEvent(events.setJob, function(job)
     TriggerEvent('hate-bridge:client:jobUpdate', job)
 end)
 
--- Framework Bridge Functions
 HateBridge = HateBridge or {}
 
--- Get player data
 HateBridge.GetPlayerData = function()
     return PlayerData
 end
 
--- Check if player is loaded
 HateBridge.IsPlayerLoaded = function()
     return isPlayerLoaded
 end
