@@ -36,6 +36,19 @@ ensure hate-bridge
 - `oxmysql` (required)
 - `ox_lib` (optional, for enhanced features)
 
+## 📚 Documentation
+
+For complete documentation, examples, and advanced usage, visit our official documentation:
+
+**[📖 HATE Development Documentation](https://hate-development.gitbook.io/hate-development-docs/hate-framework-bridge)**
+
+The documentation includes:
+- Detailed API reference
+- Step-by-step integration guides  
+- Code examples and best practices
+- Troubleshooting and FAQ
+- Framework migration guides
+
 ## Usage in Other Hate Scripts
 
 ### FXManifest Dependency
@@ -460,7 +473,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support
 
-For support and updates, visit our community or contact the development team.
+📖 **Primary Support**: [Official Documentation](https://hate-development.gitbook.io/hate-development-docs/hate-framework-bridge)
+
+For additional support:
+- Check the documentation first for common solutions
+- Visit our community forums  
+- Contact the development team
+- Report issues on GitHub
 
 ---
 
