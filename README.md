@@ -30,6 +30,7 @@ ensure hate-bridge
 | ESX | ✅ | Legacy & Final |
 | QBCore | ✅ | All Versions |
 | QBox | ✅ | Latest |
+| VRP | ✅ | 1.0+ |
 
 ## Dependencies
 

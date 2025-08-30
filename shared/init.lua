@@ -26,6 +26,7 @@ if Config.Debug then
     if serverEvents then
         print('[hate-bridge] Server events loaded for:', Config.Framework)
     end
+end
 
 if IsDuplicityVersion() then
     exports('getFramework', function()

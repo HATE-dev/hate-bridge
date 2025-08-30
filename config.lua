@@ -21,6 +21,12 @@ Config.FrameworkEvents = {
         playerUnload = 'qbx_core:client:playerUnloaded',
         setJob = 'qbx_core:client:onJobUpdate',
         playerSpawned = 'qbx_core:client:playerLoaded'
+    },
+    ['vrp'] = {
+        playerLoaded = 'vRP:playerSpawn',
+        playerUnload = 'vRP:playerLeave',
+        setJob = 'vRP:jobUpdate',
+        playerSpawned = 'vRP:playerSpawn'
     }
 }
 
@@ -36,6 +42,10 @@ Config.ServerEvents = {
     ['qbox'] = {
         playerLoaded = 'qbx_core:server:playerLoaded',
         playerDropped = 'qbx_core:server:playerLogout'
+    },
+    ['vrp'] = {
+        playerLoaded = 'vRP:playerSpawn',
+        playerDropped = 'vRP:playerLeave'
     }
 }
 
@@ -90,6 +100,8 @@ Config.DetectFramework = function()
         return 'qb'
     elseif GetResourceState('qbx_core') == 'started' then
         return 'qbox'
+    elseif GetResourceState('vrp') == 'started' then
+        return 'vrp'
     end
     return nil
 end
