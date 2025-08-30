@@ -78,9 +78,6 @@ For additional support:
 - Report issues on GitHub
 
 ---
-
-**Note**: This bridge is designed specifically for Hate scripts ecosystem. While it can be used with other resources, it's optimized for Hate scripts integration.
-
 If you experience any issues:
 
 1. Make sure HateBridge is installed correctly
