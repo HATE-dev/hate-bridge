@@ -140,7 +140,7 @@ end
 HateBridgeServer.CreateUseableItem = function(itemName, cb)
     QBCore.Functions.CreateUseableItem(itemName, cb)
 end
- to player
+
 HateBridgeServer.ShowNotification = function(source, message, type, duration)
     TriggerClientEvent('QBCore:Notify', source, message, type, duration)
 end

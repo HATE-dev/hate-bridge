@@ -142,7 +142,7 @@ end
 HateBridgeServer.CreateUseableItem = function(itemName, cb)
     ESX.RegisterUsableItem(itemName, cb)
 end
- to player
+
 HateBridgeServer.ShowNotification = function(source, message, type, duration)
     local xPlayer = ESX.GetPlayerFromId(source)
     if xPlayer then
@@ -299,7 +299,7 @@ HateBridgeServer.GetPlayerCharName = function(source, useNickname)
     end
     return nil
 end
- (weight/slot check)
+
 HateBridgeServer.CanCarryItem = function(source, itemName, amount)
     local xPlayer = ESX.GetPlayerFromId(source)
     if xPlayer then
