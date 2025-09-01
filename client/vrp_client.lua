@@ -9,7 +9,7 @@ local PlayerData = {}
 local isPlayerLoaded = false
 
 CreateThread(function()
-    while not vRP.getUserId then
+    while not vRP.getUserId do
         Wait(100)
     end
     
