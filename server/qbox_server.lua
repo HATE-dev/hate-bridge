@@ -104,6 +104,25 @@ HateBridgeServer.HasItem = function(source, itemName, amount)
     return HateBridgeServer.GetItemCount(source, itemName) >= amount
 end
 
+HateBridgeServer.GetItem = function(source, itemName)
+    local Player = QBX.Functions.GetPlayer(source)
+    if Player then
+        local item = Player.Functions.GetItemByName(itemName)
+        if item and item.amount > 0 then
+            return {
+                name = item.name,
+                amount = item.amount,
+                count = item.amount,
+                label = item.label,
+                metadata = item.info or {},
+                info = item.info or {},
+                type = item.type or 'item'
+            }
+        end
+    end
+    return nil
+end
+
 HateBridgeServer.GetPlayerJob = function(source)
     local Player = QBX.Functions.GetPlayer(source)
     if Player then

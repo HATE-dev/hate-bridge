@@ -106,6 +106,25 @@ HateBridgeServer.HasItem = function(source, itemName, amount)
     return HateBridgeServer.GetItemCount(source, itemName) >= amount
 end
 
+HateBridgeServer.GetItem = function(source, itemName)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    if xPlayer then
+        local item = xPlayer.getInventoryItem(itemName)
+        if item and item.count > 0 then
+            return {
+                name = item.name,
+                amount = item.count,
+                count = item.count,
+                label = item.label,
+                metadata = {},
+                info = {},
+                type = 'item'
+            }
+        end
+    end
+    return nil
+end
+
 HateBridgeServer.GetPlayerJob = function(source)
     local xPlayer = ESX.GetPlayerFromId(source)
     if xPlayer then

@@ -152,6 +152,25 @@ HateBridgeServer.HasItem = function(source, itemName, amount)
     return HateBridgeServer.GetItemCount(source, itemName) >= amount
 end
 
+HateBridgeServer.GetItem = function(source, itemName)
+    local userId = vRP.getUserId({source})
+    if userId then
+        local itemCount = vRP.getInventoryItemAmount({userId, itemName})
+        if itemCount > 0 then
+            return {
+                name = itemName,
+                amount = itemCount,
+                count = itemCount,
+                label = itemName,
+                metadata = {},
+                info = {},
+                type = 'item'
+            }
+        end
+    end
+    return nil
+end
+
 HateBridgeServer.CanCarryItem = function(source, itemName, amount)
     local userId = vRP.getUserId({source})
     if userId then
