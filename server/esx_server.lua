@@ -1,18 +1,11 @@
 if not Config or Config.DetectFramework() ~= 'esx' then return end
 
-local ESX = nil
-
-CreateThread(function()
-    while ESX == nil do
-        ESX = exports['es_extended']:getSharedObject()
-        Wait(100)
-    end
+local ESX = exports['es_extended']:getSharedObject()
     
-    -- Register callbacks after ESX is loaded
-    ESX.RegisterServerCallback('hate-bridge:canCarryItem', function(source, cb, itemName, amount)
-        cb(HateBridgeServer.CanCarryItem(source, itemName, amount))
-    end)
+ESX.RegisterServerCallback('hate-bridge:canCarryItem', function(source, cb, itemName, amount)
+    cb(HateBridgeServer.CanCarryItem(source, itemName, amount))
 end)
+
 
 local serverEvents = Config.ServerEvents['esx']
 
