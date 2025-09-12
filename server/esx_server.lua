@@ -7,6 +7,11 @@ CreateThread(function()
         ESX = exports['es_extended']:getSharedObject()
         Wait(100)
     end
+    
+    -- Register callbacks after ESX is loaded
+    ESX.RegisterServerCallback('hate-bridge:canCarryItem', function(source, cb, itemName, amount)
+        cb(HateBridgeServer.CanCarryItem(source, itemName, amount))
+    end)
 end)
 
 local serverEvents = Config.ServerEvents['esx']
@@ -327,10 +332,6 @@ HateBridgeServer.CanCarryItem = function(source, itemName, amount)
     end
     return false
 end
-
-ESX.RegisterServerCallback('hate-bridge:canCarryItem', function(source, cb, itemName, amount)
-    cb(HateBridgeServer.CanCarryItem(source, itemName, amount))
-end)
 
 HateBridgeServer.GetItemImagePath = function(itemName)
     if not itemName then return nil end
