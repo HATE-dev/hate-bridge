@@ -79,22 +79,82 @@ HateBridgeServer.AddItem = function(source, itemName, amount, metadata)
     return false
 end
 
-HateBridgeServer.RemoveItem = function(source, itemName, amount)
+HateBridgeServer.RemoveItem = function(source, itemName, amount, metadata)
     local xPlayer = ESX.GetPlayerFromId(source)
     if xPlayer then
-        local itemCount = xPlayer.getInventoryItem(itemName).count
-        if itemCount >= amount then
-            xPlayer.removeInventoryItem(itemName, amount)
-            return true
+        if not metadata then
+            local itemCount = xPlayer.getInventoryItem(itemName).count
+            if itemCount >= amount then
+                xPlayer.removeInventoryItem(itemName, amount)
+                return true
+            end
+        else
+            -- Remove items with specific metadata
+            local inventory = xPlayer.getInventory()
+            local removedCount = 0
+            
+            for _, itemData in pairs(inventory) do
+                if removedCount >= amount then break end
+                
+                if itemData.name == itemName then
+                    local hasValidMetadata = true
+                    if itemData.metadata then
+                        for key, value in pairs(metadata) do
+                            if itemData.metadata[key] ~= value then
+                                hasValidMetadata = false
+                                break
+                            end
+                        end
+                    else
+                        hasValidMetadata = false
+                    end
+                    
+                    if hasValidMetadata then
+                        local removeAmount = math.min(itemData.count, amount - removedCount)
+                        xPlayer.removeInventoryItem(itemName, removeAmount)
+                        removedCount = removedCount + removeAmount
+                    end
+                end
+            end
+            
+            return removedCount >= amount
         end
     end
     return false
 end
 
-HateBridgeServer.GetItemCount = function(source, itemName)
+HateBridgeServer.GetItemCount = function(source, itemName, metadata)
     local xPlayer = ESX.GetPlayerFromId(source)
     if xPlayer then
-        return xPlayer.getInventoryItem(itemName).count
+        if not metadata then
+            return xPlayer.getInventoryItem(itemName).count
+        else
+            -- Count items with specific metadata
+            local inventory = xPlayer.getInventory()
+            local totalCount = 0
+            
+            for _, itemData in pairs(inventory) do
+                if itemData.name == itemName then
+                    local hasValidMetadata = true
+                    if itemData.metadata then
+                        for key, value in pairs(metadata) do
+                            if itemData.metadata[key] ~= value then
+                                hasValidMetadata = false
+                                break
+                            end
+                        end
+                    else
+                        hasValidMetadata = false
+                    end
+                    
+                    if hasValidMetadata then
+                        totalCount = totalCount + itemData.count
+                    end
+                end
+            end
+            
+            return totalCount
+        end
     end
     return 0
 end

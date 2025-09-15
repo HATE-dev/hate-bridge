@@ -78,23 +78,84 @@ HateBridgeServer.AddItem = function(source, itemName, amount, metadata)
     return false
 end
 
-HateBridgeServer.RemoveItem = function(source, itemName, amount)
+HateBridgeServer.RemoveItem = function(source, itemName, amount, metadata)
     local Player = QBCore.Functions.GetPlayer(source)
     if Player then
-        local item = Player.Functions.GetItemByName(itemName)
-        if item and item.amount >= amount then
-            Player.Functions.RemoveItem(itemName, amount)
-            return true
+        if not metadata then
+            local item = Player.Functions.GetItemByName(itemName)
+            if item and item.amount >= amount then
+                Player.Functions.RemoveItem(itemName, amount)
+                return true
+            end
+        else
+            -- Remove items with specific metadata
+            local items = Player.PlayerData.items
+            local removedCount = 0
+            
+            for slot, itemData in pairs(items) do
+                if removedCount >= amount then break end
+                
+                if itemData and itemData.name == itemName then
+                    local hasValidMetadata = true
+                    if itemData.info then
+                        for key, value in pairs(metadata) do
+                            if itemData.info[key] ~= value then
+                                hasValidMetadata = false
+                                break
+                            end
+                        end
+                    else
+                        hasValidMetadata = false
+                    end
+                    
+                    if hasValidMetadata then
+                        local removeAmount = math.min(itemData.amount, amount - removedCount)
+                        if Player.Functions.RemoveItem(itemName, removeAmount, slot) then
+                            removedCount = removedCount + removeAmount
+                        end
+                    end
+                end
+            end
+            
+            return removedCount >= amount
         end
     end
     return false
 end
 
-HateBridgeServer.GetItemCount = function(source, itemName)
+HateBridgeServer.GetItemCount = function(source, itemName, metadata)
     local Player = QBCore.Functions.GetPlayer(source)
     if Player then
-        local item = Player.Functions.GetItemByName(itemName)
-        return item and item.amount or 0
+        if not metadata then
+            local item = Player.Functions.GetItemByName(itemName)
+            return item and item.amount or 0
+        else
+            -- Count items with specific metadata
+            local totalCount = 0
+            local items = Player.PlayerData.items
+            
+            for slot, itemData in pairs(items) do
+                if itemData and itemData.name == itemName then
+                    local hasValidMetadata = true
+                    if itemData.info then
+                        for key, value in pairs(metadata) do
+                            if itemData.info[key] ~= value then
+                                hasValidMetadata = false
+                                break
+                            end
+                        end
+                    else
+                        hasValidMetadata = false
+                    end
+                    
+                    if hasValidMetadata then
+                        totalCount = totalCount + itemData.amount
+                    end
+                end
+            end
+            
+            return totalCount
+        end
     end
     return 0
 end

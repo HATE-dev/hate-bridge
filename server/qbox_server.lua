@@ -90,11 +90,39 @@ HateBridgeServer.RemoveItem = function(source, itemName, amount)
     return false
 end
 
-HateBridgeServer.GetItemCount = function(source, itemName)
+HateBridgeServer.GetItemCount = function(source, itemName, metadata)
     local Player = QBX.Functions.GetPlayer(source)
     if Player then
-        local item = Player.Functions.GetItemByName(itemName)
-        return item and item.amount or 0
+        if not metadata then
+            local item = Player.Functions.GetItemByName(itemName)
+            return item and item.amount or 0
+        else
+            -- Count items with specific metadata
+            local totalCount = 0
+            local items = Player.PlayerData.items
+            
+            for slot, itemData in pairs(items) do
+                if itemData and itemData.name == itemName then
+                    local hasValidMetadata = true
+                    if itemData.info then
+                        for key, value in pairs(metadata) do
+                            if itemData.info[key] ~= value then
+                                hasValidMetadata = false
+                                break
+                            end
+                        end
+                    else
+                        hasValidMetadata = false
+                    end
+                    
+                    if hasValidMetadata then
+                        totalCount = totalCount + itemData.amount
+                    end
+                end
+            end
+            
+            return totalCount
+        end
     end
     return 0
 end
