@@ -127,9 +127,15 @@ HateBridgeServer.AddItem = function(source, itemName, amount, metadata)
     return false
 end
 
-HateBridgeServer.RemoveItem = function(source, itemName, amount)
+HateBridgeServer.RemoveItem = function(source, itemName, amount, metadata)
     local userId = vRP.getUserId({source})
     if userId then
+        -- VRP doesn't have native metadata support, so we ignore metadata for now
+        if metadata then
+            print("^3[hate-bridge] VRP metadata removal not yet supported^7")
+            return false
+        end
+        
         local itemCount = vRP.getInventoryItemAmount({userId, itemName})
         if itemCount >= amount then
             vRP.tryGetInventoryItem({userId, itemName, amount, true})
@@ -139,9 +145,14 @@ HateBridgeServer.RemoveItem = function(source, itemName, amount)
     return false
 end
 
-HateBridgeServer.GetItemCount = function(source, itemName)
+HateBridgeServer.GetItemCount = function(source, itemName, metadata)
     local userId = vRP.getUserId({source})
     if userId then
+        -- VRP doesn't have native metadata support, so we ignore metadata for now
+        if metadata then
+            print("^3[hate-bridge] VRP metadata checking not yet supported^7")
+            return 0
+        end
         return vRP.getInventoryItemAmount({userId, itemName}) or 0
     end
     return 0
