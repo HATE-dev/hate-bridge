@@ -9,19 +9,25 @@ end)
 
 local serverEvents = Config.ServerEvents['esx']
 
-RegisterNetEvent(serverEvents.playerLoaded, function()
-    local source = source
+RegisterNetEvent(serverEvents.playerLoaded, function(playerId, xPlayer)
+    -- ESX sends playerId and xPlayer object as parameters
+    local src = playerId or source
     if Config.Debug then
-        print('[hate-bridge] Player loaded:', source)
+        print(string.format('[hate-bridge] Player loaded: %s', tostring(src)))
     end
-    TriggerEvent('hate-bridge:server:playerLoaded', source)
+    if src and type(src) == "number" then
+        TriggerEvent('hate-bridge:server:playerLoaded', src)
+    end
 end)
 
-AddEventHandler(serverEvents.playerDropped, function(playerId)
+AddEventHandler(serverEvents.playerDropped, function(playerId, reason)
+    -- ESX playerDropped uses AddEventHandler and sends playerId
     if Config.Debug then
-        print('[hate-bridge] Player dropped:', playerId)
+        print(string.format('[hate-bridge] Player dropped: %s', tostring(playerId)))
     end
-    TriggerEvent('hate-bridge:server:playerDropped', playerId)
+    if playerId and type(playerId) == "number" then
+        TriggerEvent('hate-bridge:server:playerDropped', playerId, reason)
+    end
 end)
 
 HateBridgeServer = HateBridgeServer or {}
@@ -391,6 +397,67 @@ HateBridgeServer.GetItemImagePath = function(itemName)
 
     return Config.GetItemImagePath(itemName)
 end
+
+HateBridgeServer.SetHunger = function(source, value)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    if xPlayer then
+        -- ESX uses esx_status or esx_basicneeds
+        -- Try to set status directly via TriggerEvent
+        TriggerEvent('esx_status:set', source, 'hunger', value * 10000) -- ESX uses 0-1000000 scale, convert from 0-100
+        return true
+    end
+    return false
+end
+
+HateBridgeServer.GetHunger = function(source)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    if xPlayer then
+        -- ESX uses esx_status with 0-1000000 scale, convert to 0-100
+        local hunger = 100
+        TriggerEvent('esx_status:getStatus', source, 'hunger', function(status)
+            if status then
+                hunger = status.val / 10000
+            end
+        end)
+        return hunger
+    end
+    return 100
+end
+
+HateBridgeServer.GetThirst = function(source)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    if xPlayer then
+        -- ESX uses esx_status with 0-1000000 scale, convert to 0-100
+        local thirst = 100
+        TriggerEvent('esx_status:getStatus', source, 'thirst', function(status)
+            if status then
+                thirst = status.val / 10000
+            end
+        end)
+        return thirst
+    end
+    return 100
+end
+
+HateBridgeServer.SetThirst = function(source, value)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    if xPlayer then
+        -- ESX uses esx_status or esx_basicneeds
+        -- Try to set status directly via TriggerEvent
+        TriggerEvent('esx_status:set', source, 'thirst', value * 10000) -- ESX uses 0-1000000 scale, convert from 0-100
+        return true
+    end
+    return false
+end
+
+-- Event handlers for hunger/thirst
+RegisterNetEvent('hate-bridge:server:setHunger', function(playerId, value)
+    HateBridgeServer.SetHunger(playerId, value)
+end)
+
+RegisterNetEvent('hate-bridge:server:setThirst', function(playerId, value)
+    HateBridgeServer.SetThirst(playerId, value)
+end)
 
 exports('getBridgeServer', function()
     return HateBridgeServer

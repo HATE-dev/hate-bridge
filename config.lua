@@ -1,7 +1,7 @@
 Config = {}
 
 Config.Framework = nil -- Will be auto-detected
-Config.Debug = false
+Config.Debug = true
 
 Config.FrameworkEvents = {
     ['esx'] = {
@@ -115,11 +115,11 @@ Config.InitializeFramework = function()
 end
 
 Config.InventoryPaths = {
-    ['qb'] = 'nui://qb-inventory/html/images/',
-    ['esx'] = 'nui://ox_inventory/web/images/',
-    ['ox'] = 'nui://ox_inventory/web/images/',
-    ['quasar'] = 'nui://qs-inventory/html/images/',
     ['core'] = 'nui://core_inventory/html/img/',
+    ['ox'] = 'nui://ox_inventory/web/images/',
+    ['qb'] = 'nui://qb-inventory/html/images/',
+    ['quasar'] = 'nui://qs-inventory/html/images/',
+    ['esx'] = 'nui://ox_inventory/web/images/',
     ['custom'] = 'nui://your-inventory/html/images/'
 }
 
@@ -127,14 +127,14 @@ Config.InventoryPaths = {
 Config.GetItemImagePath = function(itemName)
     local basePath = ""
     
-    if GetResourceState('qb-inventory') == 'started' then
-        basePath = Config.InventoryPaths['qb']
+    if GetResourceState('core_inventory') == 'started' then
+        basePath = Config.InventoryPaths['core']
     elseif GetResourceState('ox_inventory') == 'started' then
         basePath = Config.InventoryPaths['ox']
+    elseif GetResourceState('qb-inventory') == 'started' then
+        basePath = Config.InventoryPaths['qb']
     elseif GetResourceState('qs-inventory') == 'started' then
         basePath = Config.InventoryPaths['quasar']
-    elseif GetResourceState('core_inventory') == 'started' then
-        basePath = Config.InventoryPaths['core']
     else
         basePath = Config.InventoryPaths['custom']
     end

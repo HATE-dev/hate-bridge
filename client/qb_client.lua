@@ -26,6 +26,31 @@ RegisterNetEvent('QBCore:Player:SetPlayerData', function(val)
     PlayerData = val
 end)
 
+-- Helper function to convert ox_target options to qb-target format
+local function ConvertOptionsForQBTarget(options)
+    if type(options) ~= 'table' then return options end
+    
+    local converted = {}
+    for i, option in ipairs(options) do
+        local qbOption = {}
+        
+        -- Copy all properties
+        for key, value in pairs(option) do
+            qbOption[key] = value
+        end
+        
+        -- Convert onSelect to action (qb-target uses action instead of onSelect)
+        if option.onSelect and not option.action then
+            qbOption.action = option.onSelect
+            qbOption.onSelect = nil
+        end
+        
+        converted[i] = qbOption
+    end
+    
+    return converted
+end
+
 HateBridge = HateBridge or {}
 HateBridge.GetPlayerData = function()
     return PlayerData
@@ -157,7 +182,18 @@ HateBridge.AddTargetEntity = function(entity, options)
     if targetSystem == 'ox_target' then
         exports.ox_target:addLocalEntity(entity, options.options or options)
     elseif targetSystem == 'qb-target' then
-        exports['qb-target']:AddTargetEntity(entity, options)
+        -- qb-target expects parameters in format: { options = {...}, distance = ... }
+        local optionsArray = options.options or options
+        
+        -- Convert onSelect to action for qb-target
+        local convertedOptions = ConvertOptionsForQBTarget(optionsArray)
+        
+        local qbParameters = {
+            options = convertedOptions,
+            distance = options.distance or 2.5
+        }
+        
+        exports['qb-target']:AddTargetEntity(entity, qbParameters)
     elseif targetSystem == 'qtarget' then
         exports.qtarget:AddTargetEntity(entity, options)
     end
@@ -179,7 +215,18 @@ HateBridge.AddTargetModel = function(models, options)
     if targetSystem == 'ox_target' then
         exports.ox_target:addModel(models, options.options or options)
     elseif targetSystem == 'qb-target' then
-        exports['qb-target']:AddTargetModel(models, options)
+        -- qb-target expects parameters in format: { options = {...}, distance = ... }
+        local optionsArray = options.options or options
+        
+        -- Convert onSelect to action for qb-target
+        local convertedOptions = ConvertOptionsForQBTarget(optionsArray)
+        
+        local qbParameters = {
+            options = convertedOptions,
+            distance = options.distance or 2.5
+        }
+        
+        exports['qb-target']:AddTargetModel(models, qbParameters)
     elseif targetSystem == 'qtarget' then
         exports.qtarget:AddTargetModel(models, options)
     end
@@ -187,10 +234,36 @@ end
 
 HateBridge.AddGlobalPed = function(options)
     local targetSystem = Config.DetectTargetSystem()
+    
+    if not targetSystem then
+        if Config.Debug then
+            print('[hate-bridge] No target system detected for AddGlobalPed')
+        end
+        return
+    end
+    
+    if not options then
+        if Config.Debug then
+            print('[hate-bridge] No options provided to AddGlobalPed')
+        end
+        return
+    end
+    
     if targetSystem == 'ox_target' then
         exports.ox_target:addGlobalPed(options.options or options)
     elseif targetSystem == 'qb-target' then
-        exports['qb-target']:AddGlobalPed(options)
+        -- qb-target expects parameters in format: { options = {...}, distance = ... }
+        local optionsArray = options.options or options
+        
+        -- Convert onSelect to action for qb-target
+        local convertedOptions = ConvertOptionsForQBTarget(optionsArray)
+        
+        local qbParameters = {
+            options = convertedOptions,
+            distance = options.distance or 2.5
+        }
+        
+        exports['qb-target']:AddGlobalPed(qbParameters)
     elseif targetSystem == 'qtarget' then
         exports.qtarget:AddGlobalPed(options)
     end

@@ -182,12 +182,18 @@ HateBridge.AddTargetEntity = function(entity, options)
     if targetSystem == 'ox_target' then
         exports.ox_target:addLocalEntity(entity, options.options or options)
     elseif targetSystem == 'qb-target' then
-        exports['qb-target']:AddTargetEntity(entity, options)
+        if options.options then
+            exports['qb-target']:AddTargetEntity(entity, options)
+        else
+            exports['qb-target']:AddTargetEntity(entity, {
+                options = options,
+                distance = options.distance or 2.5
+            })
+        end
     elseif targetSystem == 'qtarget' then
         exports.qtarget:AddTargetEntity(entity, options)
     end
 end
-
 HateBridge.RemoveTargetEntity = function(entity, optionNames)
     local targetSystem = Config.DetectTargetSystem()
     if targetSystem == 'ox_target' then
@@ -204,7 +210,14 @@ HateBridge.AddTargetModel = function(models, options)
     if targetSystem == 'ox_target' then
         exports.ox_target:addModel(models, options.options or options)
     elseif targetSystem == 'qb-target' then
-        exports['qb-target']:AddTargetModel(models, options)
+        if options.options then
+            exports['qb-target']:AddTargetModel(models, options)
+        else
+            exports['qb-target']:AddTargetModel(models, {
+                options = options,
+                distance = options.distance or 2.5
+            })
+        end
     elseif targetSystem == 'qtarget' then
         exports.qtarget:AddTargetModel(models, options)
     end

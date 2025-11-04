@@ -7,21 +7,28 @@ local vRPclient = Tunnel.getInterface("vRP","vRP")
 
 local serverEvents = Config.ServerEvents['vrp']
 
-RegisterNetEvent(serverEvents.playerLoaded, function()
-    local source = source
+RegisterNetEvent(serverEvents.playerLoaded, function(user_id, source, first_spawn)
+    -- VRP sends user_id and source as parameters
+    local src = source
     if Config.Debug then
-        print('[hate-bridge] Player loaded:', source)
+        print(string.format('[hate-bridge] Player loaded: %s (user_id: %s)', tostring(src), tostring(user_id)))
     end
-    TriggerEvent('hate-bridge:server:playerLoaded', source)
+    if src and type(src) == "number" then
+        TriggerEvent('hate-bridge:server:playerLoaded', src)
+    end
 end)
 
-RegisterNetEvent(serverEvents.playerDropped, function()
-    local source = source
+RegisterNetEvent(serverEvents.playerDropped, function(user_id, source)
+    -- VRP sends user_id and source as parameters
+    local src = source
     if Config.Debug then
-        print('[hate-bridge] Player dropped:', source)
+        print(string.format('[hate-bridge] Player dropped: %s (user_id: %s)', tostring(src), tostring(user_id)))
     end
-    TriggerEvent('hate-bridge:server:playerDropped', source)
+    if src and type(src) == "number" then
+        TriggerEvent('hate-bridge:server:playerDropped', src)
+    end
 end)
+
 
 HateBridgeServer = HateBridgeServer or {}
 
@@ -308,6 +315,53 @@ end)
 
 HateBridgeServer.CreateCallback('hate-bridge:hasItem', function(source, itemName, amount)
     return HateBridgeServer.HasItem(source, itemName, amount)
+end)
+
+HateBridgeServer.SetHunger = function(source, value)
+    local userId = vRP.getUserId({source})
+    if userId then
+        -- VRP uses hunger/thirst system (0-100 scale)
+        -- Set hunger value directly
+        vRP.setHunger({userId, value})
+        return true
+    end
+    return false
+end
+
+HateBridgeServer.GetHunger = function(source)
+    local userId = vRP.getUserId({source})
+    if userId then
+        return vRP.getHunger({userId}) or 100
+    end
+    return 100
+end
+
+HateBridgeServer.GetThirst = function(source)
+    local userId = vRP.getUserId({source})
+    if userId then
+        return vRP.getThirst({userId}) or 100
+    end
+    return 100
+end
+
+HateBridgeServer.SetThirst = function(source, value)
+    local userId = vRP.getUserId({source})
+    if userId then
+        -- VRP uses hunger/thirst system (0-100 scale)
+        -- Set thirst value directly
+        vRP.setThirst({userId, value})
+        return true
+    end
+    return false
+end
+
+-- Event handlers for hunger/thirst
+RegisterNetEvent('hate-bridge:server:setHunger', function(playerId, value)
+    HateBridgeServer.SetHunger(playerId, value)
+end)
+
+RegisterNetEvent('hate-bridge:server:setThirst', function(playerId, value)
+    HateBridgeServer.SetThirst(playerId, value)
 end)
 
 exports('getServerBridge', function()

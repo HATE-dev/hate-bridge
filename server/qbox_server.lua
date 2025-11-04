@@ -4,21 +4,28 @@ local QBX = exports['qbx_core']:GetCoreObject()
 
 local serverEvents = Config.ServerEvents['qbox']
 
-RegisterNetEvent(serverEvents.playerLoaded, function()
-    local source = source
+RegisterNetEvent(serverEvents.playerLoaded, function(playerId)
+    -- QBox sends player ID as parameter
+    local src = playerId or source
     if Config.Debug then
-        print('[hate-bridge] Player loaded:', source)
+        print(string.format('[hate-bridge] Player loaded: %s', tostring(src)))
     end
-    TriggerEvent('hate-bridge:server:playerLoaded', source)
+    if src and type(src) == "number" then
+        TriggerEvent('hate-bridge:server:playerLoaded', src)
+    end
 end)
 
 RegisterNetEvent(serverEvents.playerDropped, function()
-    local source = source
+    -- QBox logout event uses source global
+    local src = source
     if Config.Debug then
-        print('[hate-bridge] Player logout:', source)
+        print(string.format('[hate-bridge] Player logout: %s', tostring(src)))
     end
-    TriggerEvent('hate-bridge:server:playerDropped', source)
+    if src and type(src) == "number" then
+        TriggerEvent('hate-bridge:server:playerDropped', src)
+    end
 end)
+
 
 HateBridgeServer = HateBridgeServer or {}
 
@@ -373,6 +380,53 @@ HateBridgeServer.GetItemImagePath = function(itemName)
 
     return Config.GetItemImagePath(itemName)
 end
+
+HateBridgeServer.SetHunger = function(source, value)
+    local Player = QBX.Functions.GetPlayer(source)
+    if Player then
+        -- QBox uses metadata for hunger/thirst (0-100 scale)
+        Player.Functions.SetMetaData('hunger', value)
+        TriggerClientEvent('hud:client:UpdateNeeds', source, value, Player.PlayerData.metadata['thirst'] or 100)
+        return true
+    end
+    return false
+end
+
+HateBridgeServer.GetHunger = function(source)
+    local Player = QBX.Functions.GetPlayer(source)
+    if Player then
+        return Player.PlayerData.metadata['hunger'] or 100
+    end
+    return 100
+end
+
+HateBridgeServer.GetThirst = function(source)
+    local Player = QBX.Functions.GetPlayer(source)
+    if Player then
+        return Player.PlayerData.metadata['thirst'] or 100
+    end
+    return 100
+end
+
+HateBridgeServer.SetThirst = function(source, value)
+    local Player = QBX.Functions.GetPlayer(source)
+    if Player then
+        -- QBox uses metadata for hunger/thirst (0-100 scale)
+        Player.Functions.SetMetaData('thirst', value)
+        TriggerClientEvent('hud:client:UpdateNeeds', source, Player.PlayerData.metadata['hunger'] or 100, value)
+        return true
+    end
+    return false
+end
+
+-- Event handlers for hunger/thirst
+RegisterNetEvent('hate-bridge:server:setHunger', function(playerId, value)
+    HateBridgeServer.SetHunger(playerId, value)
+end)
+
+RegisterNetEvent('hate-bridge:server:setThirst', function(playerId, value)
+    HateBridgeServer.SetThirst(playerId, value)
+end)
 
 exports('getBridgeServer', function()
     return HateBridgeServer
